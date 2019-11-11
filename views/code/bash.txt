@@ -1,0 +1,5 @@
+./sonar-scanner \
+    -Dsonar.analysis.commitId=$COMMIT_ID \
+    -Dsonar.analysis.repository=$REPOSITORY
+
+# COMMIT_ID and REPOSITORY need to be acquired using the git cli

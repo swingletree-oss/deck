@@ -1,0 +1,17 @@
+deck:
+  port: 3000
+
+  elastic:
+    enabled: false
+    node: http://localhost:9200
+    auth: # elastic nodejs auth object
+      username:
+      password:
+      apiKey:
+    index: swingletree
+
+  features:
+    dashboard: true
+
+  github:
+    page: # the GitHub App public page. Will be referenced in the Swingletree landing page.
