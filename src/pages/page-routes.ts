@@ -115,13 +115,17 @@ class PageRoutes {
 
     // index page route
     router.get("/", async (req, res) => {
-      const buildStats = await this.historyService.getStats("now-1y");
-
       res.locals.basePath = ".";
-      res.locals.buildStats = buildStats.reduce((agg: any, curr) => {
-        agg[curr.key] = curr.doc_count;
-        return agg;
-      }, {});
+
+      if (this.isBuildHistoryEnabled) {
+        const buildStats = await this.historyService.getStats("now-1y");
+        res.locals.buildStats = buildStats.reduce((agg: any, curr) => {
+          agg[curr.key] = curr.doc_count;
+          return agg;
+        }, {});
+      } else {
+        res.locals.buildStats = {};
+      }
 
       res.render("index");
     });

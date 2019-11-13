@@ -5,6 +5,11 @@ import { HistoryService, ElasticHistoryService, NoopHistoryService } from "./his
 import { ConfigurationService, DeckConfig } from "./configuration";
 import { log } from "@swingletree-oss/harness";
 
+
+process.on("unhandledRejection", error => {
+  log.error("Unhandled Promise rejection: %j", error);
+});
+
 class Deck {
   private webserver: WebServer;
   private pageRoutes: PageRoutes;
