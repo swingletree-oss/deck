@@ -8,7 +8,6 @@ import { ConfigurationService, DeckConfig } from "../configuration";
 import { HistoryService } from "../history/history-service";
 import { SwingletreeUtil } from "../util";
 import { log } from "@swingletree-oss/harness";
-import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from "constants";
 
 @injectable()
 class PageRoutes {
@@ -29,7 +28,7 @@ class PageRoutes {
 
       this.isBuildHistoryEnabled = historyService.isEnabled();
       this.features = configService.getObject(DeckConfig.FEATURES);
-      this.basePath = configService.get(DeckConfig.PATH);
+      this.basePath = configService.get(DeckConfig.PATH) || ".";
   }
 
   public filters(): any {
@@ -134,6 +133,7 @@ class PageRoutes {
     }
 
     router.use("/static", express.static("static"));
+    router.use("/modules/d3/", express.static("node_modules/d3/dist/"));
 
     return router;
   }
