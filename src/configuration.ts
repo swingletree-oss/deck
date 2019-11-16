@@ -64,5 +64,6 @@ export enum DeckConfig {
   ELASTIC_AUTH = "deck:elastic:auth",
   ELASTIC_INDEX = "deck:elastic:index",
   GITHUB_PAGE = "deck:github:page",
-  FEATURES = "deck:features"
+  FEATURES = "deck:features",
+  PATH = "deck:path"
 }

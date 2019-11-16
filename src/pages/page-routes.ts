@@ -18,6 +18,7 @@ class PageRoutes {
 
   private publicPageUrl: string;
   private readonly features: object;
+  private readonly basePath: string;
 
   constructor(
     @inject(ConfigurationService) configService: ConfigurationService,
@@ -28,6 +29,7 @@ class PageRoutes {
 
       this.isBuildHistoryEnabled = historyService.isEnabled();
       this.features = configService.getObject(DeckConfig.FEATURES);
+      this.basePath = configService.get(DeckConfig.PATH);
   }
 
   public filters(): any {
@@ -57,8 +59,6 @@ class PageRoutes {
       const pageSize = 20;
       const fromIndex = pageSize * queryPage;
 
-      res.locals.basePath = "..";
-
       Promise.all([
         this.historyService.getOrgs(),
         (req.query.query) ? this.historyService.search(req.query.query, fromIndex, pageSize) : this.historyService.getLatest(fromIndex, pageSize)
@@ -86,8 +86,6 @@ class PageRoutes {
 
   private enableCodeSnippetPage(router: Router) {
     router.get("/code/", (req, res) => {
-      res.locals.basePath = "..";
-
       res.render("code");
     });
   }
@@ -105,6 +103,7 @@ class PageRoutes {
       res.locals.appPublicPage = this.publicPageUrl;
       res.locals.isBuildHistoryEnabled = this.isBuildHistoryEnabled;
       res.locals.path = req.path;
+      res.locals.basePath = this.basePath;
       res.locals.flatten = this.flatten;
       res.locals.features = this.features;
 
@@ -115,8 +114,6 @@ class PageRoutes {
 
     // index page route
     router.get("/", async (req, res) => {
-      res.locals.basePath = ".";
-
       if (this.isBuildHistoryEnabled) {
         const buildStats = await this.historyService.getStats("now-1y");
         res.locals.buildStats = buildStats.reduce((agg: any, curr) => {

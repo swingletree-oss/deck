@@ -1,5 +1,6 @@
 deck:
   port: 3000
+  path: "" # base path of deck. Set this to the path of your reverse proxy. Empty string for /
 
   elastic:
     enabled: false
