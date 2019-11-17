@@ -13,6 +13,7 @@ deck:
 
   features:
     dashboard: true
+    yoke: https://github.com/error418/yoke/releases
 
   github:
     page: # the GitHub App public page. Will be referenced in the Swingletree landing page.

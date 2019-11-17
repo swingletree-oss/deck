@@ -1,0 +1,27 @@
+extends base
+
+block content
+  div(class="row")
+    div(class="col-md-12")
+      script(src=`${ basePath }/modules/d3/d3.min.js`)
+      script(src=`${ basePath }/static/js/charts.js`)
+
+      if features.dashboard && isBuildHistoryEnabled && buildStats
+        div.row.no-gutters.mb-3
+          div.card-group
+            div.card
+              div.card-body
+                div.chart-buildstats
+                script.
+                  $(document).ready(() => {
+                    var data = !{JSON.stringify(buildStats)};
+                    buildStatsChart(".chart-buildstats", data, 200);
+                  });
+
+      div
+        h3 Sorry, something went wrong serving your request
+        
+        p Please try again later or message your Swingletree administrator.
+
+        if error
+          pre=error
