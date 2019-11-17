@@ -32,7 +32,6 @@ class Deck {
 
   public run() {
     this.webserver.addRouter("/", this.pageRoutes.getRoute());
-    this.webserver.setLocale("filters", this.pageRoutes.filters());
   }
 
 }

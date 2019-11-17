@@ -28,15 +28,7 @@ class PageRoutes {
 
       this.isBuildHistoryEnabled = historyService.isEnabled();
       this.features = configService.getObject(DeckConfig.FEATURES);
-      this.basePath = configService.get(DeckConfig.PATH) || ".";
-  }
-
-  public filters(): any {
-    return {
-      "code": function (text: string, options: any) {
-        return `<pre><code class="language-${options.lang}">${require("pug").runtime.escape(text)}</code></pre>`;
-      }
-    };
+      this.basePath = configService.get(DeckConfig.PATH) || "/";
   }
 
   private componentIcon(componentId: string) {
@@ -76,22 +68,23 @@ class PageRoutes {
 
           res.render("builds");
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           log.warn("failed to render build overview");
           log.warn(err);
-        });
-    });
-  }
 
-  private enableCodeSnippetPage(router: Router) {
-    router.get("/code/", (req, res) => {
-      res.render("code");
+          res.locals.error = err.message;
+          res.render("error");
+        });
     });
   }
 
   private flatten(object: any, preserveArrays: boolean) {
     const result = SwingletreeUtil.flattenObject(object, preserveArrays);
     return result;
+  }
+
+  private basePathTransformer(path: string) {
+    return `${ this.basePath }${ path }`.replace(/\/+/, "/");
   }
 
   public getRoute(): Router {
@@ -102,7 +95,7 @@ class PageRoutes {
       res.locals.appPublicPage = this.publicPageUrl;
       res.locals.isBuildHistoryEnabled = this.isBuildHistoryEnabled;
       res.locals.path = req.path;
-      res.locals.basePath = this.basePath;
+      res.locals.basePath = this.basePathTransformer.bind(this);
       res.locals.flatten = this.flatten;
       res.locals.features = this.features;
 
@@ -114,19 +107,21 @@ class PageRoutes {
     // index page route
     router.get("/", async (req, res) => {
       if (this.isBuildHistoryEnabled) {
-        const buildStats = await this.historyService.getStats("now-1y");
-        res.locals.buildStats = buildStats.reduce((agg: any, curr) => {
-          agg[curr.key] = curr.doc_count;
-          return agg;
-        }, {});
+        try {
+          const buildStats = await this.historyService.getStats("now-1y");
+          res.locals.buildStats = buildStats.reduce((agg: any, curr) => {
+            agg[curr.key] = curr.doc_count;
+            return agg;
+          }, {});
+        } catch (err) {
+          log.warn("Failed to retrieve information from elastic. Caused by: %s", err);
+        }
       } else {
         res.locals.buildStats = {};
       }
 
       res.render("index");
     });
-
-    this.enableCodeSnippetPage(router);
 
     if (this.historyService.isEnabled()) {
       this.enableHistoryService(router);
