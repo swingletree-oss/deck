@@ -1,0 +1,8 @@
+.bg-primary-light {
+  background-color: darken($primary, 10%);
+}
+
+$secondary-light: lighten($secondary, 10%);
+.bg-secondary-light {
+  background-color: $secondary-light;
+}

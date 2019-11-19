@@ -21,7 +21,7 @@ class Deck {
       log.info("Registering Elastic Storage Service");
       container.bind<HistoryService>(HistoryService).to(ElasticHistoryService).inSingletonScope();
     } else {
-      log.info("Elastic is disabled. Will not write any Notification Events to Elastic.");
+      log.info("Elastic is disabled. Will not read any Notification Events from Elastic.");
       container.bind<HistoryService>(HistoryService).to(NoopHistoryService).inSingletonScope();
     }
     container.get<HistoryService>(HistoryService);

@@ -1,7 +1,6 @@
 @import "_variables.scss";
 @import "../../node_modules/bootstrap-scss/bootstrap.scss";
 
-
 @function readableColor($color) {  
   @if (lightness( $color ) > 40) {
     @return black;
@@ -11,8 +10,13 @@
   }
 }
 
+@import "colors.scss";
+
+$body-padding: 5rem;
+
 body {
   min-height: 100vh;
+  padding-top: $body-padding;
 }
 
 .popover {

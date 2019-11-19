@@ -23,8 +23,8 @@ html
 
         script(src=basePath("static/js/base.js"))
 
-    body(style="padding-top:5rem")
-        nav(class="navbar navbar-dark bg-dark navbar-expand-md fixed-top")
+    body
+        nav(class="navbar navbar-dark bg-secondary-light navbar-expand-md fixed-top")
             a(class="navbar-brand mr-3" href=basePath(""))
                 img(src=basePath("static/icon.svg") width="30" height="30" class="mr-2 d-inline-block align-top" alt="")
                 .
@@ -35,29 +35,27 @@ html
 
             div.collapse.navbar-collapse(id="navbarToggle")
                 ul(class="navbar-nav mr-auto")
-                    li(class="nav-item")
-                        if appPublicPage
+                    if isBuildHistoryEnabled
+                        li.nav-item
+                            a(class=`nav-link ${path.endsWith('/builds/') ? 'active' : '' }` href=basePath("builds/"))
+                                i.fas.fa-fw.fa-list
+                                span.pl-1 Builds
+
+                
+                ul(class="navbar-nav")
+                    if appPublicPage
+                        li.nav-item
                             a(class="nav-link" href=appPublicPage + "/installations/new")
                                 i(class="fas fa-fw mr-1 fa-plus")
                                 .
                                     Install
-                        if isBuildHistoryEnabled
-                            a(class=`nav-link ${path.endsWith('/builds/') ? 'active' : '' }` href=basePath("builds/"))
-                                i.fas.fa-fw.fa-list
-                                span.pl-1 Builds
-                
                 ul(class="navbar-nav")
-
-                    if features.yoke
-                        li.nav-item
-                            a.nav-link(href=features.yoke)
-                                i.fas.fa-fw.fa-terminal
-                                span.pl-1 Yoke CLI
-                    
                     li.nav-item
-                        a.nav-link(href="https://github.com/error418/swingletree")
-                            i.fab.fa-fw.mr-1.fa-github
-                            span.pl-1 GitHub
+                        a(class="nav-link" href="https://swingletree-oss.github.io/swingletree/docs/home")
+                            i(class="fa-fw mr-1 far fa-question-circle")
+                            .
+                                Help
 
-        div.container-fluid
+
+        div.container-fluid.page-content
             block content
