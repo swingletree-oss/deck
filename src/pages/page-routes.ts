@@ -76,6 +76,24 @@ class PageRoutes {
           res.render("error");
         });
     });
+
+    router.get("/builds/:owner/:repo", (req, res) => {
+      res.locals.owner = req.params["owner"];
+      res.locals.repo = req.params["repo"];
+
+      Promise.all([
+        this.historyService.getFor(res.locals.owner, res.locals.repo)
+      ]).then((data) => {
+        res.locals.data = data;
+        res.render("builds-org");
+      }).catch((err: Error) => {
+        log.warn("failed to render detail build overview");
+        log.warn("%j", err);
+
+        res.locals.error = err.message;
+        res.render("error");
+      });
+    });
   }
 
   private flatten(object: any, preserveArrays: boolean) {

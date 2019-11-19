@@ -3,6 +3,7 @@ import { injectable, inject } from "inversify";
 import { ConfigurationService, DeckConfig } from "../configuration";
 import { log, Harness } from "@swingletree-oss/harness";
 import NodeCache = require("node-cache");
+import { HistoryQuery } from "./query";
 
 @injectable()
 export abstract class HistoryService {
@@ -11,6 +12,7 @@ export abstract class HistoryService {
   abstract getLatestForSender(sender: string, branch: string): Promise<RequestEvent<any, any>>;
   abstract getOrgs(search?: string): Promise<RequestEvent<any, any>>;
   abstract getStats(timespan: string): Promise<BuildStatusBucket[]>;
+  abstract getFor(owner: string, repo?: string): Promise<any>;
 
   abstract isEnabled(): boolean;
 }
@@ -48,31 +50,28 @@ export class ElasticHistoryService implements HistoryService {
       index: this.index,
       from: from,
       size: size,
-      body: {
-        query: {
-          simple_query_string: {
-            query : query
-          }
-        }
-      }
+      body: HistoryQuery.querySearch(query)
     });
 
     return result.body;
+  }
+
+  public async getFor(owner: string, repo?: string) {
+    log.debug("get entries for %s %s", owner, repo);
+    const searchParams: RequestParams.Search<any> = {
+      index: this.index,
+      size: 10,
+      body: HistoryQuery.queryForOwnerAndRepo(owner, repo)
+    };
+
+    return (await this.client.search(searchParams)).body;
   }
 
   public async getLatest(from = 0, size= 10) {
     log.debug("get latest entries from %s, size %s", from, size);
     const searchParams: RequestParams.Search<any> = {
       index: this.index,
-      body: {
-        from: from,
-        size: size,
-        sort: [{
-          timestamp: {
-            order: "desc"
-          }
-        }]
-      }
+      body: HistoryQuery.queryForLatest(from, size)
     };
 
     return (await this.client.search(searchParams)).body;
@@ -81,27 +80,7 @@ export class ElasticHistoryService implements HistoryService {
   public async getLatestForSender(sender: string, branch: string) {
     const searchParams: RequestParams.Search<any> = {
       index: this.index,
-      body: {
-        size: 10,
-        query: {
-          bool: {
-            must: [],
-            filter: [{
-                bool: {
-                  must: [
-                    { match: { "sender.keyword": sender }},
-                    { match: { "branch.keyword": branch }}
-                  ]
-                }
-            }]
-          }
-        },
-        sort: [{
-          timestamp: {
-            order: "desc"
-          }
-        }]
-      }
+      body: HistoryQuery.queryForLatestBySender(sender, branch)
     };
 
     const result: ApiResponse<SearchResponse<Harness.AnalysisReport>> = await this.client.search(searchParams);
@@ -117,21 +96,7 @@ export class ElasticHistoryService implements HistoryService {
     if (result == undefined) {
       const searchParams: RequestParams.Search = {
         index: this.index,
-        body: {
-          size: 0,
-          aggs : {
-            results : {
-              terms : { field : "checkStatus.keyword" }
-            }
-          },
-          query: {
-            range : {
-              timestamp : {
-                gte: timespan
-              }
-            }
-          }
-        }
+        body: HistoryQuery.queryStats(timespan)
       };
 
       const response: ApiResponse = await this.client.search(searchParams);
@@ -143,19 +108,10 @@ export class ElasticHistoryService implements HistoryService {
     return result;
   }
 
-  public async getOrgs(search = "*") {
+  public async getOrgs() {
     const searchParams: RequestParams.Search = {
       index: this.index,
-      body: {
-        size: 0,
-        aggs: {
-          orgs: {
-            terms: {
-              field: "org.keyword"
-            }
-          }
-        }
-      }
+      body: HistoryQuery.queryOwner()
     };
 
     const result: ApiResponse = await this.client.search(searchParams);
@@ -175,6 +131,10 @@ export class NoopHistoryService implements HistoryService {
 
   public isEnabled() {
     return false;
+  }
+
+  public async getFor(owner: string, repo?: string) {
+    return Promise.resolve(null);
   }
 
   public async getStats(timespan: string = "now-1y"): Promise<BuildStatusBucket[]> {
