@@ -6,3 +6,21 @@ $secondary-light: lighten($secondary, 10%);
 .bg-secondary-light {
   background-color: $secondary-light;
 }
+
+
+
+.bg-sev-blocker {
+  background-color: $sev-blocker-color;
+}
+
+.bg-sev-major {
+  background-color: $sev-major-color;
+}
+
+.bg-sev-warning {
+  background-color: $sev-warning-color;
+}
+
+.bg-sev-info {
+  background-color: $sev-info-color;
+}
