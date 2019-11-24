@@ -52,7 +52,8 @@ class PageRoutes {
 
       Promise.all([
         this.historyService.getOrgs(),
-        (req.query.query) ? this.historyService.search(req.query.query, fromIndex, pageSize) : this.historyService.getLatest(fromIndex, pageSize)
+        (req.query.query) ? this.historyService.search(req.query.query, fromIndex, pageSize) : this.historyService.getLatest(fromIndex, pageSize),
+        this.historyService.getLastActiveOwners()
       ]).then((data) => {
           res.locals.orgs = data[0];
           res.locals.builds = data[1];
@@ -77,15 +78,26 @@ class PageRoutes {
         });
     });
 
-    router.get("/builds/:owner/:repo", (req, res) => {
+    router.get("/builds/:owner", (req, res) => {
       res.locals.owner = req.params["owner"];
-      res.locals.repo = req.params["repo"];
+      req.query.page = parseInt(req.query.page, 10);
+      const queryPage = (isNaN(req.query.page)) ? 0 : req.query.page;
+
+      const pageSize = 20;
+      const fromIndex = pageSize * queryPage;
 
       Promise.all([
-        this.historyService.getFor(res.locals.owner, res.locals.repo)
+        this.historyService.getFor(res.locals.owner, null, fromIndex, pageSize)
       ]).then((data) => {
-        res.locals.data = data;
-        res.render("builds-org");
+        res.locals.builds = data[0];
+        res.locals.paging = {
+          total: data[0].hits.total.value,
+          pages: Math.ceil(data[0].hits.total.value / pageSize),
+          pageSize: pageSize,
+          current: queryPage
+        };
+
+        res.render("builds");
       }).catch((err: Error) => {
         log.warn("failed to render detail build overview");
         log.warn("%j", err);
@@ -125,20 +137,28 @@ class PageRoutes {
     // index page route
     router.get("/", async (req, res) => {
       if (this.isBuildHistoryEnabled) {
-        try {
-          const buildStats = await this.historyService.getStats("now-1y");
-          res.locals.buildStats = buildStats.reduce((agg: any, curr) => {
+        Promise.all([
+          this.historyService.getStats("now-1y"),
+          this.historyService.getLastActiveOwners()
+        ]).then((data) => {
+          res.locals.buildStats = data[0].reduce((agg: any, curr: any) => {
             agg[curr.key] = curr.doc_count;
             return agg;
           }, {});
-        } catch (err) {
-          log.warn("Failed to retrieve information from elastic. Caused by: %s", err);
-        }
+
+          res.locals.lastActiveOwners = data[1];
+
+          res.render("index");
+        }).catch((err: Error) => {
+          log.warn("failed to render index");
+          log.warn("%j", err);
+
+          res.render("error");
+        });
       } else {
         res.locals.buildStats = {};
+        res.render("index");
       }
-
-      res.render("index");
     });
 
     if (this.historyService.isEnabled()) {
@@ -147,6 +167,7 @@ class PageRoutes {
 
     router.use("/static", express.static("static"));
     router.use("/modules/d3/", express.static("node_modules/d3/dist/"));
+    router.use("/modules/jdenticon/", express.static("node_modules/jdenticon/dist/"));
 
     return router;
   }

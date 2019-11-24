@@ -17,6 +17,11 @@ block content
                     var data = !{JSON.stringify(buildStats)};
                     buildStatsChart(".chart-buildstats", data, 200);
                   });
+            div.card
+              div.card-body
+                each owner in lastActiveOwners
+                  div 
+                    a(href=`./builds/${owner.key}`)=owner.key
 
       div(class="jumbotron")
         h1 Hi, there!

@@ -28,6 +28,8 @@ block content
             tr(data-target=`#build-item-${ index }` data-toggle="collapse"  class="accordion-toggle build-row")
               td
                 span(class=`fas fa-fw fa-${ componentIcon(item.sender) }`)
+                if item.uuid
+                  svg(class="ml-2" height="20", width="20", data-jdenticon-value=`${item.uuid}`)
               td=item.sender
               td
                 span.coordinates
