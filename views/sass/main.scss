@@ -125,16 +125,11 @@ pre {
 }
 
 td.detail-row {
-  box-shadow: inset 0px 11px 8px -10px $gray-500, inset 0px -11px 8px -10px $gray-500;
-  background-color: $gray-100;
-
   padding-top: 0px;
   padding-bottom: 0px;
 
   border-top: 0px;
   border-bottom: 0px;
-  border-left: 1px solid $gray-200;
-  border-right: 1px solid $gray-200;
 
   .build-detail {
     padding-top: 0;

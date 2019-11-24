@@ -6,10 +6,10 @@ function donutChart(selector, data, title, dimension = 200) {
   var radius = Math.min(width, height) / 2 - margin
   var svg = d3.select(selector)
     .append("svg")
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr('viewBox', '-100 -100 200 200')
     .append("g")
-      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
   var pie = d3.pie().value(function(d) {return d.value; })
   var data_ready = pie(d3.entries(data))
