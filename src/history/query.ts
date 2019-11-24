@@ -94,7 +94,30 @@ export class HistoryQuery {
       aggs: {
         orgs: {
           terms: {
-            field: "org.keyword"
+            field: "source.owner.keyword"
+          }
+        }
+      },
+      query: {
+        match_all: {}
+      }
+    };
+  }
+
+  public static queryLastActiveOwners(timestamp: string = "now-4h"): any {
+    return {
+      size: 0,
+      aggs: {
+        orgs: {
+          terms: {
+            field: "source.owner.keyword"
+          }
+        }
+      },
+      query: {
+        range: {
+          timestamp: {
+            gte: timestamp
           }
         }
       }

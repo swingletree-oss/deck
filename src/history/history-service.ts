@@ -12,7 +12,8 @@ export abstract class HistoryService {
   abstract getLatestForSender(sender: string, branch: string): Promise<RequestEvent<any, any>>;
   abstract getOrgs(search?: string): Promise<RequestEvent<any, any>>;
   abstract getStats(timespan: string): Promise<BuildStatusBucket[]>;
-  abstract getFor(owner: string, repo?: string): Promise<any>;
+  abstract getFor(owner: string, repo: string, from: number, size: number): Promise<any>;
+  abstract getLastActiveOwners(): Promise<any>;
 
   abstract isEnabled(): boolean;
 }
@@ -56,11 +57,12 @@ export class ElasticHistoryService implements HistoryService {
     return result.body;
   }
 
-  public async getFor(owner: string, repo?: string) {
+  public async getFor(owner: string, repo?: string, from = 0, size = 10) {
     log.debug("get entries for %s %s", owner, repo);
     const searchParams: RequestParams.Search<any> = {
       index: this.index,
-      size: 10,
+      from: from,
+      size: size,
       body: HistoryQuery.queryForOwnerAndRepo(owner, repo)
     };
 
@@ -75,6 +77,15 @@ export class ElasticHistoryService implements HistoryService {
     };
 
     return (await this.client.search(searchParams)).body;
+  }
+
+  public async getLastActiveOwners() {
+    const searchParams: RequestParams.Search<any> = {
+      index: this.index,
+      body: HistoryQuery.queryLastActiveOwners()
+    };
+
+    return (await this.client.search(searchParams)).body.aggregations.orgs.buckets;
   }
 
   public async getLatestForSender(sender: string, branch: string) {
@@ -154,6 +165,10 @@ export class NoopHistoryService implements HistoryService {
   }
 
   public async getOrgs(search: string) {
+    return Promise.resolve(null);
+  }
+
+  public async getLastActiveOwners() {
     return Promise.resolve(null);
   }
 }
