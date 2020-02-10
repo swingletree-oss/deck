@@ -84,7 +84,7 @@ block content
                                     th Build ID
                                     td
                                       svg(height="16", data-jdenticon-value=`${item.uuid}`)
-                                      span=item.uuid
+                                      a(href=`?query=${item.uuid}`)=item.uuid
 
                           else
                             span None
