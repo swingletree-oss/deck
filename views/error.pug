@@ -20,8 +20,13 @@ block content
 
       div
         h3 Sorry, something went wrong serving your request
-        
+
+        p Swingletree may be missing a mandatory resource (for example a database connection) and can therefore not serve you the web interface.
+
         p Please try again later or message your Swingletree administrator.
 
         if error
-          pre=error
+          hr
+          div(style="font-size:.7em")
+            p(style="font-weight:bold") It's dangerous to go alone! Take this.
+            pre=error.stack
