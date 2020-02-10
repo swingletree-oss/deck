@@ -102,7 +102,9 @@ class PageRoutes {
         log.warn("failed to render detail build overview");
         log.warn("%j", err);
 
-        res.locals.error = err.message;
+        if (process.env.NODE_ENV?.toLowerCase() != "production") {
+          res.locals.error = err;
+        }
         res.render("error");
       });
     });
