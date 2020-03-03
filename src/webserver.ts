@@ -43,7 +43,7 @@ export class WebServer {
       getToken: (req: express.Request) => {
         return req.cookies.token;
       }
-    }).unless({path: ["/static", "/modules"]}));
+    }).unless({path: [/(static|modules)\/.*/]}));
 
     this.app.use(function (err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
       if (err.name === "UnauthorizedError") {
@@ -52,11 +52,6 @@ export class WebServer {
       } else {
         next(err);
       }
-    });
-
-    this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-      console.log(req.user);
-      next();
     });
 
     // set common headers
