@@ -4,6 +4,7 @@ import { WebServer } from "./webserver";
 import { HistoryService, ElasticHistoryService, NoopHistoryService } from "./history/history-service";
 import { ConfigurationService, DeckConfig } from "./configuration";
 import { log } from "@swingletree-oss/harness";
+import { Authenticator } from "./auth/auth";
 
 
 process.on("unhandledRejection", error => {
@@ -13,6 +14,7 @@ process.on("unhandledRejection", error => {
 class Deck {
   private webserver: WebServer;
   private pageRoutes: PageRoutes;
+  private authenticator: Authenticator;
 
   constructor() {
 
@@ -28,10 +30,12 @@ class Deck {
 
     this.webserver = container.get<WebServer>(WebServer);
     this.pageRoutes = container.get<PageRoutes>(PageRoutes);
+    this.authenticator = container.get<Authenticator>(Authenticator);
   }
 
   public run() {
     this.webserver.addRouter("/", this.pageRoutes.getRoute());
+    this.webserver.addRouter("/auth", this.authenticator.getRouter());
   }
 
 }

@@ -2,6 +2,20 @@ deck:
   port: 3000
   path: # base path of deck. Set this to the path of your reverse proxy. Do not set it for /
 
+  auth:
+    jwt:
+      secret:
+    github:
+      clientID: 
+      clientSecret: 
+      authorizationURL: https://github.com/login/oauth/authorize
+      tokenURL: https://github.com/login/oauth/access_token
+      userProfileURL: https://api.github.com/user
+      callbackURL: http://localhost:3020/auth/github/callback
+
+  cookies:
+    secure: true
+
   elastic:
     enabled: false
     node: http://localhost:9200

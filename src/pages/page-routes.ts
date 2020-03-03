@@ -130,6 +130,8 @@ class PageRoutes {
       res.locals.basePath = this.basePathTransformer.bind(this);
       res.locals.flatten = this.flatten;
       res.locals.features = this.features;
+      res.locals.user = req.user;
+      res.locals.isAuthenticated = !!req.user;
 
       res.locals.componentIcon = this.componentIcon;
       res.locals.moment = require("moment");

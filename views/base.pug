@@ -26,37 +26,58 @@ html
 
     body
         nav(class="navbar navbar-dark bg-secondary-light navbar-expand-md fixed-top")
-            a(class="navbar-brand mr-3" href=basePath(""))
-                img(src=basePath("static/icon.svg") width="30" height="30" class="mr-2 d-inline-block align-top" alt="")
-                .
-                    Swingletree
+            div.container
+                a(class="navbar-brand mr-3" href=basePath(""))
+                    img(src=basePath("static/icon.svg") width="30" height="30" class="mr-2 d-inline-block align-top" alt="")
+                    .
+                        Swingletree
 
-            button.navbar-toggler(type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation")
-                span.navbar-toggler-icon
+                button.navbar-toggler(type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation")
+                    span.navbar-toggler-icon
 
-            div.collapse.navbar-collapse(id="navbarToggle")
-                ul(class="navbar-nav mr-auto")
-                    if isBuildHistoryEnabled
+                div.collapse.navbar-collapse(id="navbarToggle")
+                    ul(class="navbar-nav mr-auto")
+                        if isBuildHistoryEnabled
+                            li.nav-item
+                                a(class=`nav-link ${path.endsWith('/builds/') ? 'active' : '' }` href=basePath("builds/"))
+                                    i.fas.fa-fw.fa-list
+                                    span.pl-1 Builds
+
+                    
+                    ul(class="navbar-nav")
+                        if appPublicPage
+                            li.nav-item
+                                a(class="nav-link" href=appPublicPage + "/installations/new")
+                                    i(class="fas fa-fw mr-1 fa-plus")
+                                    .
+                                        Install
+                    ul(class="navbar-nav")
                         li.nav-item
-                            a(class=`nav-link ${path.endsWith('/builds/') ? 'active' : '' }` href=basePath("builds/"))
-                                i.fas.fa-fw.fa-list
-                                span.pl-1 Builds
-
-                
-                ul(class="navbar-nav")
-                    if appPublicPage
-                        li.nav-item
-                            a(class="nav-link" href=appPublicPage + "/installations/new")
-                                i(class="fas fa-fw mr-1 fa-plus")
+                            a(class="nav-link" href="https://swingletree-oss.github.io/swingletree/docs/home")
+                                i(class="fa-fw mr-1 far fa-question-circle")
                                 .
-                                    Install
-                ul(class="navbar-nav")
-                    li.nav-item
-                        a(class="nav-link" href="https://swingletree-oss.github.io/swingletree/docs/home")
-                            i(class="fa-fw mr-1 far fa-question-circle")
-                            .
-                                Help
+                                    Help
+
+                        if user
+                            li.nav-item.dropdown.dropdown-menu-right
+                                a.nav-link.user-card.dropdown-toggle(href="#" id="userMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                    img.avatar(src=user.data.avatar)
+                                    span=user.data.username
+                                div.dropdown-menu(aria-labelledby="userMenuLink")
+                                    h6.dropdown-header Organizations
+                                    each org, index in user.data.orgs
+                                        a.dropdown-item(href=basePath(`/builds/${org}`))=org    
+                                    div.dropdown-divider
+                                    a.dropdown-item(href=basePath("/auth/logout")) Logout
+                                        
+                        else
+                            li.nav-item
+                                a(class="nav-link" href=basePath("/auth/github"))
+                                    i(class="fa-fw mr-1 fas fa-sign-in-alt")
+                                    .
+                                        Login
 
 
-        div.container-fluid.page-content
+
+        div.container.page-content
             block content

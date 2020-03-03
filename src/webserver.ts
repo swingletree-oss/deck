@@ -4,12 +4,15 @@ import bodyParser = require("body-parser");
 import * as compression from "compression";
 import { ConfigurationService, DeckConfig } from "./configuration";
 import { log } from "@swingletree-oss/harness";
+import * as jwtMiddleware from "express-jwt";
 
 @injectable()
 export class WebServer {
   private app: express.Express;
 
   private port: number;
+  private jwtSecret: any;
+  private basePath: string;
 
   constructor(
     @inject(ConfigurationService) configService: ConfigurationService
@@ -17,16 +20,44 @@ export class WebServer {
     this.app = express();
 
     this.port = configService.getNumber(DeckConfig.PORT);
+    this.jwtSecret = configService.get(DeckConfig.AUTH_JWT_SECRET);
+    this.basePath = configService.get(DeckConfig.PATH) || "/";
 
     this.initialize();
   }
 
   private initialize() {
+    const redirectPath = this.basePath;
+
+
     // express configuration
     this.app.set("port", this.port);
     this.app.use(compression());
+    this.app.use(require("cookie-parser")());
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
+
+    this.app.use(jwtMiddleware({
+      credentialsRequired: false,
+      secret: this.jwtSecret,
+      getToken: (req: express.Request) => {
+        return req.cookies.token;
+      }
+    }).unless({path: ["/static", "/modules"]}));
+
+    this.app.use(function (err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
+      if (err.name === "UnauthorizedError") {
+        res.clearCookie("token");
+        res.redirect(redirectPath);
+      } else {
+        next(err);
+      }
+    });
+
+    this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+      console.log(req.user);
+      next();
+    });
 
     // set common headers
     this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

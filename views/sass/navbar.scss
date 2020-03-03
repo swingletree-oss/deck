@@ -1,0 +1,14 @@
+.user-card {
+  span {
+    font-size: .8em;
+  }
+
+  img {
+    &.avatar {
+      margin-right: 3px;
+      height: 1.2em;
+      border-radius: 5px;
+      border: 1px lighten($primary, 30%) solid;
+    }
+  }
+}
