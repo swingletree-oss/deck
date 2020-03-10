@@ -5,7 +5,7 @@ export class HistoryQuery {
     return this.queryForOwnerAndRepo(owner);
   }
 
-  public static queryForOwnerAndRepo(owner: string, repo?: string) {
+  public static queryForOwnerAndRepo(owner: string, repo?: string, sha?: string, queryString?: string) {
     const query: any = {
       aggs: {
         report_types: {
@@ -16,17 +16,39 @@ export class HistoryQuery {
       },
       query: {
         bool: {
-          filter: [
-            { term:  { "source.owner.keyword": owner }}
-          ]
+          must: []
         }
       }
     };
 
-    if (repo) {
-      query.query.bool.filter.push({
-        term: {
-          "source.repo.keyword": repo
+    if (owner) {
+      query.query.bool.must.push({
+        match: {
+          "source.owner.keyword": owner
+        }
+      });
+
+      if (repo) {
+        query.query.bool.must.push({
+          match: {
+            "source.repo.keyword": repo
+          }
+        });
+
+        if (sha) {
+          query.query.bool.must.push({
+            match: {
+              "source.sha.keyword": sha
+            }
+          });
+        }
+      }
+    }
+
+    if (queryString) {
+      query.query.bool.must.push({
+        simple_query_string: {
+          query: queryString
         }
       });
     }
@@ -67,6 +89,42 @@ export class HistoryQuery {
           order: "desc"
         }
       }]
+    };
+  }
+
+  public static queryForBuildId(uuid: string): any {
+    return {
+      query: {
+        bool: {
+          must: [],
+          filter: [{
+              bool: {
+                must: [
+                  { match: { "uuid": uuid }}
+                ]
+              }
+          }]
+        }
+      }
+    };
+  }
+
+  public static queryForSource(owner: string, repo: string, sha: string): any {
+    return {
+      query: {
+        bool: {
+          must: [],
+          filter: [{
+              bool: {
+                must: [
+                  { match: { "source.sha.keyword": sha }},
+                  { match: { "source.owner.keyword": owner }},
+                  { match: { "source.repo.keyword": repo }}
+                ]
+              }
+          }]
+        }
+      }
     };
   }
 

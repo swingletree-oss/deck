@@ -8,6 +8,7 @@ import { ConfigurationService, DeckConfig } from "../configuration";
 import { HistoryService } from "../history/history-service";
 import { SwingletreeUtil } from "../util";
 import { log } from "@swingletree-oss/harness";
+import { BuildsPage } from "./builds/builds";
 
 @injectable()
 class PageRoutes {
@@ -43,71 +44,11 @@ class PageRoutes {
   }
 
   private enableHistoryService(router: Router) {
-    router.get("/builds", (req, res) => {
-      req.query.page = parseInt(req.query.page, 10);
-      const queryPage = (isNaN(req.query.page)) ? 0 : req.query.page;
-
-      const pageSize = 20;
-      const fromIndex = pageSize * queryPage;
-
-      Promise.all([
-        this.historyService.getOrgs(),
-        (req.query.query) ? this.historyService.search(req.query.query, fromIndex, pageSize) : this.historyService.getLatest(fromIndex, pageSize),
-        this.historyService.getLastActiveOwners()
-      ]).then((data) => {
-          res.locals.orgs = data[0];
-          res.locals.builds = data[1];
-
-          res.locals.paging = {
-            total: data[1].hits.total.value,
-            pages: Math.ceil(data[1].hits.total.value / pageSize),
-            pageSize: pageSize,
-            current: queryPage
-          };
-
-          res.locals.query = req.query.query;
-
-          res.render("builds");
-        })
-        .catch((err: Error) => {
-          log.warn("failed to render build overview");
-          log.warn(err);
-
-          res.locals.error = err.message;
-          res.render("error");
-        });
-    });
-
-    router.get("/builds/:owner", (req, res) => {
-      res.locals.owner = req.params["owner"];
-      req.query.page = parseInt(req.query.page, 10);
-      const queryPage = (isNaN(req.query.page)) ? 0 : req.query.page;
-
-      const pageSize = 20;
-      const fromIndex = pageSize * queryPage;
-
-      Promise.all([
-        this.historyService.getFor(res.locals.owner, null, fromIndex, pageSize)
-      ]).then((data) => {
-        res.locals.builds = data[0];
-        res.locals.paging = {
-          total: data[0].hits.total.value,
-          pages: Math.ceil(data[0].hits.total.value / pageSize),
-          pageSize: pageSize,
-          current: queryPage
-        };
-
-        res.render("builds");
-      }).catch((err: Error) => {
-        log.warn("failed to render detail build overview");
-        log.warn("%j", err);
-
-        if (process.env.NODE_ENV?.toLowerCase() != "production") {
-          res.locals.error = err;
-        }
-        res.render("error");
-      });
-    });
+    const buildsPage = new BuildsPage(this.historyService, "builds");
+    router.get("/builds", buildsPage.handleRoute());
+    router.get("/builds/:owner", buildsPage.handleRoute());
+    router.get("/builds/:owner/:repo", buildsPage.handleRoute());
+    router.get("/builds/:owner/:repo/:sha", buildsPage.handleRoute());
   }
 
   private flatten(object: any, preserveArrays: boolean) {
@@ -119,24 +60,27 @@ class PageRoutes {
     return `${ this.basePath }${ path }`.replace(/\/+/, "/");
   }
 
+  private setBaseLocals(req: Request, res: Response, next: NextFunction) {
+    res.locals.appPublicPage = this.publicPageUrl;
+    res.locals.isBuildHistoryEnabled = this.isBuildHistoryEnabled;
+    res.locals.path = req.path;
+    res.locals.basePath = this.basePathTransformer.bind(this);
+    res.locals.flatten = this.flatten;
+    res.locals.features = this.features;
+    res.locals.user = req.user;
+    res.locals.isAuthenticated = !!req.user;
+
+    res.locals.componentIcon = this.componentIcon;
+    res.locals.moment = require("moment");
+
+    next();
+  }
+
   public getRoute(): Router {
     const router = Router();
 
     // set locals for all pages
-    router.use("/", (req: Request, res: Response, next: NextFunction) => {
-      res.locals.appPublicPage = this.publicPageUrl;
-      res.locals.isBuildHistoryEnabled = this.isBuildHistoryEnabled;
-      res.locals.path = req.path;
-      res.locals.basePath = this.basePathTransformer.bind(this);
-      res.locals.flatten = this.flatten;
-      res.locals.features = this.features;
-      res.locals.user = req.user;
-      res.locals.isAuthenticated = !!req.user;
-
-      res.locals.componentIcon = this.componentIcon;
-      res.locals.moment = require("moment");
-      next();
-    });
+    router.use("/", this.setBaseLocals.bind(this));
 
     // index page route
     router.get("/", async (req, res) => {
@@ -176,6 +120,10 @@ class PageRoutes {
     return router;
   }
 
+}
+
+export abstract class PageRoute {
+  abstract handleRoute(): express.RequestHandler;
 }
 
 export default PageRoutes;

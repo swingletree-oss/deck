@@ -8,11 +8,10 @@ import { HistoryQuery } from "./query";
 @injectable()
 export abstract class HistoryService {
   abstract getLatest(from: number, size: number): Promise<any>;
-  abstract search(query: string, from: number, size: number): Promise<any>;
   abstract getLatestForSender(sender: string, branch: string): Promise<RequestEvent<any, any>>;
   abstract getOrgs(search?: string): Promise<RequestEvent<any, any>>;
   abstract getStats(timespan: string): Promise<BuildStatusBucket[]>;
-  abstract getFor(owner: string, repo: string, from: number, size: number): Promise<any>;
+  abstract getFor(owner: string, repo: string, sha: string, queryString: string, from: number, size: number): Promise<any>;
   abstract getLastActiveOwners(): Promise<any>;
 
   abstract isEnabled(): boolean;
@@ -57,13 +56,13 @@ export class ElasticHistoryService implements HistoryService {
     return result.body;
   }
 
-  public async getFor(owner: string, repo?: string, from = 0, size = 10) {
-    log.debug("get entries for %s %s", owner, repo);
+  public async getFor(owner: string, repo?: string, sha?: string, queryString?: string, from = 0, size = 10) {
+    log.debug("search owner:%s repo:%s sha:%s query:%s", owner, repo, sha, queryString);
     const searchParams: RequestParams.Search<any> = {
       index: this.index,
       from: from,
       size: size,
-      body: HistoryQuery.queryForOwnerAndRepo(owner, repo)
+      body: HistoryQuery.queryForOwnerAndRepo(owner, repo, sha, queryString)
     };
 
     return (await this.client.search(searchParams)).body;
