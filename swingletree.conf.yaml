@@ -4,10 +4,10 @@ deck:
 
   auth:
     jwt:
-      secret: changemeplease
+      secret: # if ypu do not set this a random secret will be generated on startup
     github:
       clientID: 
-      clientSecret:
+      clientSecret: 
       authorizationURL: https://github.com/login/oauth/authorize
       tokenURL: https://github.com/login/oauth/access_token
       userProfileURL: https://api.github.com/user

@@ -5,7 +5,7 @@ import { HistoryService, ElasticHistoryService, NoopHistoryService } from "./his
 import { ConfigurationService, DeckConfig } from "./configuration";
 import { log } from "@swingletree-oss/harness";
 import { Authenticator } from "./auth/auth";
-
+import * as crypto from "crypto";
 
 process.on("unhandledRejection", error => {
   log.error("Unhandled Promise rejection: %j", error);
@@ -19,6 +19,12 @@ class Deck {
   constructor() {
 
     const configService = container.get<ConfigurationService>(ConfigurationService);
+
+    if (configService.getBoolean(DeckConfig.FEATURES_LOGIN) && !configService.get(DeckConfig.AUTH_JWT_SECRET)) {
+      log.warn("no jwt secret is set. deck will compensate by generating a secret. This will cause problems, if you run multiple deck instances");
+      configService.set(DeckConfig.AUTH_JWT_SECRET, crypto.randomBytes(64).toString("hex").slice(0, 32));
+    }
+
     if (configService.getBoolean(DeckConfig.ELASTIC_ENABLED)) {
       log.info("Registering Elastic Storage Service");
       container.bind<HistoryService>(HistoryService).to(ElasticHistoryService).inSingletonScope();

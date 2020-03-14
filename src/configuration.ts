@@ -39,6 +39,11 @@ export class ConfigurationService {
     return value;
   }
 
+  public set(key: string, value: any) {
+    log.info("performing configuration overwrite for %s", key);
+    this.config.set(key, value);
+  }
+
   public getObject(key: string): any {
     return this.config.get(key);
   }
