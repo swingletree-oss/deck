@@ -4,7 +4,7 @@ deck:
 
   auth:
     jwt:
-      secret: # if ypu do not set this a random secret will be generated on startup
+      secret: # if you do not set this a random secret will be generated on startup
     github:
       clientID: 
       clientSecret: 
