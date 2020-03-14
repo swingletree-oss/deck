@@ -17,7 +17,7 @@ class PageRoutes {
   private readonly isBuildHistoryEnabled: boolean;
 
   private publicPageUrl: string;
-  private readonly features: object;
+  private readonly features: any;
   private readonly basePath: string;
 
   constructor(
@@ -30,6 +30,8 @@ class PageRoutes {
       this.isBuildHistoryEnabled = historyService.isEnabled();
       this.features = configService.getObject(DeckConfig.FEATURES);
       this.basePath = configService.get(DeckConfig.PATH) || "/";
+
+      this.features.login = configService.getBoolean(DeckConfig.FEATURES_LOGIN);
   }
 
   private componentIcon(componentId: string) {

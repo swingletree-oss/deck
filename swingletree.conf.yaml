@@ -4,10 +4,10 @@ deck:
 
   auth:
     jwt:
-      secret:
+      secret: changemeplease
     github:
       clientID: 
-      clientSecret: 
+      clientSecret:
       authorizationURL: https://github.com/login/oauth/authorize
       tokenURL: https://github.com/login/oauth/access_token
       userProfileURL: https://api.github.com/user
@@ -17,7 +17,7 @@ deck:
     secure: true
 
   elastic:
-    enabled: false
+    enabled: true
     node: http://localhost:9200
     auth: # elastic nodejs auth object
       username:
@@ -26,8 +26,8 @@ deck:
     index: swingletree
 
   features:
-    dashboard: true
+    login: true # enable authentication via github
     yoke: https://github.com/error418/yoke/releases
 
   github:
-    page: # the GitHub App public page. Will be referenced in the Swingletree landing page.
+    page: http://localhost # the GitHub App public page. Will be referenced in the Swingletree landing page.

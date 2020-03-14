@@ -30,12 +30,20 @@ class Deck {
 
     this.webserver = container.get<WebServer>(WebServer);
     this.pageRoutes = container.get<PageRoutes>(PageRoutes);
-    this.authenticator = container.get<Authenticator>(Authenticator);
+
+    if (configService.getBoolean(DeckConfig.FEATURES_LOGIN)) {
+      log.info("initialize authenticator");
+      this.authenticator = container.get<Authenticator>(Authenticator);
+    }
   }
 
   public run() {
     this.webserver.addRouter("/", this.pageRoutes.getRoute());
-    this.webserver.addRouter("/auth", this.authenticator.getRouter());
+
+    if (this.authenticator) {
+      log.info("register authentication endpoints");
+      this.webserver.addRouter("/auth", this.authenticator.getRouter());
+    }
   }
 
 }
