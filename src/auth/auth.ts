@@ -32,7 +32,12 @@ export class Authenticator {
           json: true
         }, function (error, response, body: any[]) {
           if (!error) {
-            user.orgs = body.map( item => item.login );
+            user.orgs = body.map( item => {
+              return {
+                name: item.login,
+                avatar: item.avatar_url
+              };
+             });
             return cb(null, user);
           } else {
             log.error(`failed to retrieve user information for ${profile.username}`);
@@ -93,5 +98,8 @@ export class User {
   displayName: string;
   username: string;
   avatar: string;
-  orgs: string[];
+  orgs: {
+    name: string;
+    avatar: string;
+  }[];
 }

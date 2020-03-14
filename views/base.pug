@@ -19,7 +19,7 @@ html
         meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
 
         script(src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous")
-        script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js", integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o", crossorigin="anonymous")
+        script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js", integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous")
 
         script(src=basePath("modules/jdenticon/jdenticon.min.js") async)
         script(src=basePath("static/js/base.js"))
@@ -44,13 +44,27 @@ html
                                     span.pl-1 Builds
 
                     
-                    ul(class="navbar-nav")
-                        if appPublicPage
-                            li.nav-item
-                                a(class="nav-link" href=appPublicPage + "/installations/new")
-                                    i(class="fas fa-fw mr-1 fa-plus")
+                    if appPublicPage
+                        ul(class="navbar-nav")
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href="#" id="navbarActionsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                     .
-                                        Install
+                                        Actions
+
+                                div(class="dropdown-menu" aria-labelledby="navbarActionsDropdown")
+                                    if appPublicPage
+                                        a.dropdown-item(href=appPublicPage + "/installations/new")
+                                            i(class="fas fa-fw mr-1 fa-plus")
+                                            .
+                                                Install Swingletree
+                                    if features.yoke
+                                        a.dropdown-item(href=features.yoke)
+                                            i(class="fa-fw mr-1 fas fa-download")
+                                            .
+                                                Download Yoke
+
+                            
+
                     ul(class="navbar-nav")
                         li.nav-item
                             a(class="nav-link" href="https://swingletree-oss.github.io/swingletree/docs/home")
@@ -58,24 +72,31 @@ html
                                 .
                                     Help
 
-                        if user
-                            li.nav-item.dropdown.dropdown-menu-right
-                                a.nav-link.user-card.dropdown-toggle(href="#" id="userMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                                    img.avatar(src=user.data.avatar)
-                                    span=user.data.username
-                                div.dropdown-menu(aria-labelledby="userMenuLink")
-                                    h6.dropdown-header Organizations
-                                    each org, index in user.data.orgs
-                                        a.dropdown-item(href=basePath(`/builds/${org}`))=org    
-                                    div.dropdown-divider
-                                    a.dropdown-item(href=basePath("/auth/logout")) Logout
-                                        
-                        else
-                            li.nav-item
-                                a(class="nav-link" href=basePath("/auth/github"))
-                                    i(class="fa-fw mr-1 fas fa-sign-in-alt")
-                                    .
-                                        Login
+                        if features.login
+                            if user
+                                li.nav-item.dropdown
+                                    a.nav-link.user-card.dropdown-toggle(href="#" id="userMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                        img.avatar.mr-1(src=user.data.avatar)
+                                        span=user.data.username
+                                    div.dropdown-menu.dropdown-menu-right(aria-labelledby="userMenuLink")
+                                        h6.dropdown-header Your Organizations
+                                        each org, index in user.data.orgs.slice(0,5)
+                                            a.dropdown-item(href=basePath(`/builds/${org.name}`))
+                                                img.avatar.mr-2(src=org.avatar)
+                                                .
+                                                    #{org.name}
+                                        div.dropdown-divider
+                                        a.dropdown-item(href=basePath("/auth/logout"))
+                                            i(class="fas fa-fw mr-2 fa-power-off")
+                                            .
+                                                Logout
+                                            
+                            else
+                                li.nav-item
+                                    a(class="nav-link" href=basePath("/auth/github"))
+                                        i(class="fa-fw mr-1 fas fa-sign-in-alt")
+                                        .
+                                            Login
 
 
 
