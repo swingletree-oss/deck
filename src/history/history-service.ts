@@ -10,9 +10,7 @@ export abstract class HistoryService {
   abstract getLatest(from: number, size: number): Promise<any>;
   abstract getLatestForSender(sender: string, branch: string): Promise<RequestEvent<any, any>>;
   abstract getOrgs(search?: string): Promise<RequestEvent<any, any>>;
-  abstract getStats(timespan: string): Promise<BuildStatusBucket[]>;
   abstract getFor(owner: string, repo: string, sha: string, queryString: string, from: number, size: number): Promise<any>;
-  abstract getLastActiveOwners(): Promise<any>;
 
   abstract isEnabled(): boolean;
 }
@@ -78,15 +76,6 @@ export class ElasticHistoryService implements HistoryService {
     return (await this.client.search(searchParams)).body;
   }
 
-  public async getLastActiveOwners() {
-    const searchParams: RequestParams.Search<any> = {
-      index: this.index,
-      body: HistoryQuery.queryLastActiveOwners()
-    };
-
-    return (await this.client.search(searchParams)).body.aggregations.orgs.buckets;
-  }
-
   public async getLatestForSender(sender: string, branch: string) {
     const searchParams: RequestParams.Search<any> = {
       index: this.index,
@@ -94,26 +83,6 @@ export class ElasticHistoryService implements HistoryService {
     };
 
     const result: ApiResponse<SearchResponse<Harness.AnalysisReport>> = await this.client.search(searchParams);
-
-    return result;
-  }
-
-  public async getStats(timespan: string = "now-1y"): Promise<BuildStatusBucket[]> {
-    const cacheKey = `${ElasticHistoryService.CACHE_BUILD_STATS}-${timespan}`;
-
-    let result = this.cache.get(cacheKey) as BuildStatusBucket[];
-
-    if (result == undefined) {
-      const searchParams: RequestParams.Search = {
-        index: this.index,
-        body: HistoryQuery.queryStats(timespan)
-      };
-
-      const response: ApiResponse = await this.client.search(searchParams);
-
-      result = response.body.aggregations.results.buckets as BuildStatusBucket[];
-      this.cache.set(cacheKey, result);
-    }
 
     return result;
   }
@@ -147,10 +116,6 @@ export class NoopHistoryService implements HistoryService {
     return Promise.resolve(null);
   }
 
-  public async getStats(timespan: string = "now-1y"): Promise<BuildStatusBucket[]> {
-    return Promise.resolve(null);
-  }
-
   public async getLatest(from: number, size: number) {
     return Promise.resolve(null);
   }
@@ -167,9 +132,6 @@ export class NoopHistoryService implements HistoryService {
     return Promise.resolve(null);
   }
 
-  public async getLastActiveOwners() {
-    return Promise.resolve(null);
-  }
 }
 
 interface BuildStatusBucket {

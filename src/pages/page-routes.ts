@@ -84,29 +84,7 @@ class PageRoutes {
 
     // index page route
     router.get("/", async (req, res) => {
-      if (this.isBuildHistoryEnabled) {
-        Promise.all([
-          this.historyService.getStats("now-1y"),
-          this.historyService.getLastActiveOwners()
-        ]).then((data) => {
-          res.locals.buildStats = data[0].reduce((agg: any, curr: any) => {
-            agg[curr.key] = curr.doc_count;
-            return agg;
-          }, {});
-
-          res.locals.lastActiveOwners = data[1];
-
-          res.render("index");
-        }).catch((err: Error) => {
-          log.warn("failed to render index");
-          log.warn("%j", err);
-
-          res.render("error");
-        });
-      } else {
-        res.locals.buildStats = {};
-        res.render("index");
-      }
+      res.render("index");
     });
 
     if (this.historyService.isEnabled()) {
