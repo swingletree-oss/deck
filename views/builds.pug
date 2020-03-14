@@ -135,7 +135,21 @@ block content
                             div No data
           else
             tr
-              td.text-center.text-muted(colspan=7) No entries available for query
+              td.text-center.text-muted(colspan=7)
+                span No entries available 
+                if query
+                  span for query 
+                if owner
+                  .
+                    in 
+                  i #{owner}
+                    if repo
+                      .
+                        /#{repo}
+                      if sha
+                        .
+                          @#{sha.substring(0,5)}
+
 
     div.col-12
       - var pageDisplay = 7;
