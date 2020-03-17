@@ -20,7 +20,7 @@ class Deck {
 
     const configService = container.get<ConfigurationService>(ConfigurationService);
 
-    if (configService.getBoolean(DeckConfig.FEATURES_LOGIN) && !configService.get(DeckConfig.AUTH_JWT_SECRET)) {
+    if (!configService.get(DeckConfig.AUTH_JWT_SECRET)) {
       log.warn("no jwt secret is set. deck will compensate by generating a secret. This will cause problems, if you run multiple deck instances");
       configService.set(DeckConfig.AUTH_JWT_SECRET, crypto.randomBytes(64).toString("hex").slice(0, 32));
     }
