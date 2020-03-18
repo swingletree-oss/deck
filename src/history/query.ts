@@ -14,6 +14,9 @@ export class HistoryQuery {
           }
         }
       },
+      sort : [
+        { timestamp: "desc" }
+      ],
       query: {
         bool: {
           must: []
