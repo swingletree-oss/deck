@@ -48,7 +48,7 @@ block content
                 td=build._source.title
                 td(style="vertical-align:middle")
                   div.progress(style="height:.75rem;font-size:.7rem")
-                    - var bar = item.annotations.reduce((acc, curr) => { if (!acc[curr.severity]) acc[curr.severity] = 0; acc[curr.severity]++; return acc; }, {})
+                    - var bar = (item.annotations) ? item.annotations.reduce((acc, curr) => { if (!acc[curr.severity]) acc[curr.severity] = 0; acc[curr.severity]++; return acc; }, {}) : []
                     each barItem, index in bar
                       div(class=`progress-bar bg-sev-${index}` style=`width: ${barItem / item.annotations.length * 100}%`) #{ barItem }
                 td
