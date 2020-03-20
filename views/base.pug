@@ -74,17 +74,24 @@ html
 
                         if features.login
                             if user
+                                - var orgCap = 6;
+
                                 li.nav-item.dropdown
                                     a.nav-link.user-card.dropdown-toggle(href="#" id="userMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                                         img.avatar.mr-1(src=user.data.avatar)
                                         span=user.data.username
                                     div.dropdown-menu.dropdown-menu-right(aria-labelledby="userMenuLink")
                                         h6.dropdown-header Your Organizations
-                                        each org, index in user.data.orgs.slice(0,5)
+                                        each org, index in user.data.orgs.slice(0,orgCap)
                                             a.dropdown-item(href=basePath(`/builds/${org.name}`))
                                                 img.avatar.mr-2(src=org.avatar)
                                                 .
                                                     #{org.name}
+                                        if user.data.orgs.length > orgCap
+                                            a.dropdown-item(data-toggle="modal" href="#modalOrgPicker")
+                                                i.fa-fw.fas.fa-bars.mr-2
+                                                .
+                                                    #{user.data.orgs.length - orgCap} more
                                         div.dropdown-divider
                                         a.dropdown-item(href=basePath("/auth/logout"))
                                             i(class="fas fa-fw mr-2 fa-power-off")
@@ -102,3 +109,21 @@ html
 
         div.container.page-content
             block content
+
+        if user
+            div.modal(tabindex="-1" role="dialog" id="modalOrgPicker")
+                div.modal-dialog(role="document")
+                    div.modal-content
+                        div.modal-header
+                            h5.modal-title Your Organizations
+                            button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+                                span(aria-hidden="true") &times;
+                        div.modal-body
+                            div.list-group
+                            each org, index in user.data.orgs
+                                a.list-group-item.list-group-item-action(href=basePath(`/builds/${org.name}`))
+                                    img.avatar.mr-2(src=org.avatar)
+                                    .
+                                        #{org.name}
+                        div.modal-footer
+                            button(type="button" class="btn btn-secondary" data-dismiss="modal") Close
