@@ -29,6 +29,7 @@ export class ElasticHistoryService implements HistoryService {
   ) {
     this.client = new Client({
       node: configService.get(DeckConfig.ELASTIC_NODE),
+      auth: configService.getObject(DeckConfig.ELASTIC_AUTH)
     });
 
     this.index = configService.get(DeckConfig.ELASTIC_INDEX);
