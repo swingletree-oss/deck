@@ -34,6 +34,7 @@ block content
           if builds.hits.total.value > 0
             each build, index in builds.hits.hits
               - var item = build._source;
+              - var getQueryString = () => { return (query)? `?query=${query}` : "" }
               tr(data-target=`#build-item-${ index }` data-toggle="collapse"  class="accordion-toggle build-row")
                 td
                   span(class=`fas fa-fw fa-${ componentIcon(item.sender) }`)
@@ -42,9 +43,9 @@ block content
                 td=item.sender
                 td
                   span.coordinates(onclick="event.stopPropagation()")
-                    a(class="org" href=basePath(`builds/${item.source.owner}/`))=item.source.owner
-                    a(class="repo" href=basePath(`builds/${item.source.owner}/${item.source.repo}/`))=item.source.repo
-                    a(class="sha" href=basePath(`builds/${item.source.owner}/${item.source.repo}/${item.source.sha}/`))=item.source.sha.substring(0,5)
+                    a(class="org" href=basePath(`builds/${item.source.owner}/${getQueryString()}`))=item.source.owner
+                    a(class="repo" href=basePath(`builds/${item.source.owner}/${item.source.repo}/${getQueryString()}`))=item.source.repo
+                    a(class="sha" href=basePath(`builds/${item.source.owner}/${item.source.repo}/${item.source.sha}/${getQueryString()}`))=item.source.sha.substring(0,5)
                 td=build._source.title
                 td(style="vertical-align:middle")
                   div.progress(style="height:.75rem;font-size:.7rem")
