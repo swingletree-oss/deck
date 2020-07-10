@@ -19,8 +19,8 @@ export class BuildsPage implements PageRoute {
       res.locals.sha = req.params["sha"];
       res.locals.query = req.query.query;
 
-      req.query.page = parseInt(req.query.page, 10);
-      const queryPage = (isNaN(req.query.page)) ? 0 : req.query.page;
+      const page = parseInt(req.query.page as string, 10);
+      const queryPage = (isNaN(page)) ? 0 : page;
 
       const pageSize = 20;
       const fromIndex = pageSize * queryPage;

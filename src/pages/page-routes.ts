@@ -97,6 +97,13 @@ class PageRoutes {
     router.use("/modules/d3/", express.static("node_modules/d3/dist/"));
     router.use("/modules/jdenticon/", express.static("node_modules/jdenticon/dist/"));
 
+    // 404 handling
+    router.use(function(req, res, next) {
+      res.status(404);
+      res.render("404");
+    });
+
+
     return router;
   }
 
