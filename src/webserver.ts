@@ -40,6 +40,7 @@ export class WebServer {
     this.app.use(jwtMiddleware({
       credentialsRequired: false,
       secret: this.jwtSecret,
+      algorithms: [ "HS256" ],
       getToken: (req: express.Request) => {
         return req.cookies.token;
       }

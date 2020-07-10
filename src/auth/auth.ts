@@ -68,7 +68,7 @@ export class Authenticator {
     router.get("/github", passport.authenticate("github", { scope: [ "user:email", "read:org" ] }));
     router.get("/github/callback", passport.authenticate("github", { failureRedirect: "/login" }),
     function(req, res) {
-      const token = jwt.sign({ data: req.user }, secret, { expiresIn: "1h" });
+      const token = jwt.sign({ data: req.user }, secret, { algorithm: "HS256", expiresIn: "1h" });
       res.cookie("token", token, { secure: secureCookies });
       res.redirect(basePath);
     });
