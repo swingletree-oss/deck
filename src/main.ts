@@ -44,12 +44,12 @@ class Deck {
   }
 
   public run() {
-    this.webserver.addRouter("/", this.pageRoutes.getRoute());
-
     if (this.authenticator) {
       log.info("register authentication endpoints");
       this.webserver.addRouter("/auth", this.authenticator.getRouter());
     }
+
+    this.webserver.addRouter("/", this.pageRoutes.getRoute());
   }
 
 }
