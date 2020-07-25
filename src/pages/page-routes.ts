@@ -40,6 +40,8 @@ class PageRoutes {
       case "security/zap": return "crosshairs";
       case "sonarqube": return "bug";
       case "gradle/nebula": return "toolbox";
+      case "test/testng": return "vial";
+      case "test/junit": return "vial";
     }
 
     return "question";
