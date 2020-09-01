@@ -29,13 +29,20 @@ export class WebServer {
   private initialize() {
     const redirectPath = this.basePath;
 
+    const maxBodySize = process.env["MAX_BODY_SIZE"] || "1mb";
+    log.info("setting max body-size to %s", maxBodySize);
 
     // express configuration
     this.app.set("port", this.port);
     this.app.use(compression());
     this.app.use(require("cookie-parser")());
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(bodyParser.json({
+      limit: maxBodySize
+    }));
+    this.app.use(bodyParser.urlencoded({
+      limit: maxBodySize,
+      extended: true
+    }));
 
     this.app.use(jwtMiddleware({
       credentialsRequired: false,
