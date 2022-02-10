@@ -94,7 +94,7 @@
     "eslint": "^7.27.0",
     "mocha": "^8.4.0",
     "mockserver": "^3.1.1",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "nodemon": "^2.0.7",
     "npm-check-updates": "^7.1.1",
     "semantic-release": "^17.4.3",
