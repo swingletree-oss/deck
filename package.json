@@ -57,7 +57,7 @@
     "jdenticon": "^2.2.0",
     "js-yaml": "^3.14.0",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "nconf": "^0.11.2",
     "node-cache": "^5.1.2",
     "passport": "^0.4.1",
